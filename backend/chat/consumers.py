@@ -6,7 +6,7 @@ from .models import ChatRoom, ChatMessage
 
 class ChatConsumer(JsonWebsocketConsumer):
     def connection_groups(self, **kwargs):
-        return ["test"]
+        return ["livechat"]
 
     def receive(self, content, **kwargs):
         print(content)
@@ -20,7 +20,7 @@ class ChatConsumer(JsonWebsocketConsumer):
                 room, _ = ChatRoom.objects.get_or_create(name=channel)
                 chat_message = ChatMessage.objects.create(room=room, user=username, message=message)
 
-                self.send({
+                self.group_send("livechat", {
                     'type': 'MESSAGE_UPDATE',
                     'data': {
                         'channel': channel,

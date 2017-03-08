@@ -34,10 +34,10 @@ Vagrant.configure("2") do |config|
     apt-get install -y python3-pip npm redis-server
     pip3 install --upgrade setuptools pip
     pip3 install --upgrade Django channels asgi_redis
+    sudo ln -s /usr/bin/nodejs /usr/bin/node
     npm install npm@latest -g
     npm install -g create-react-app
-    cd /opt/backend
+    cd /opt/livechat
     python3 manage.py migrate
-    cd /opt/frontend
   SHELL
 end

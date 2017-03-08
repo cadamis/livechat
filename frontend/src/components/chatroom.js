@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+import { Button, Form, FormGroup, FormControl, ControlLabel, ListGroup, ListGroupItem } from 'react-bootstrap';
 
 class ChatRoom extends React.Component {
     constructor(props) {
@@ -36,8 +36,12 @@ class ChatRoom extends React.Component {
     onSocketData(message_event) {
         let data = JSON.parse(message_event.data);
         if (data['type'] === "MESSAGE_UPDATE") {
-            this.state.messages.push(data['data']);
-            this.setState({messages: this.state.messages});
+            let messages = this.state.messages;
+            messages.push(data['data']);
+            while(messages.length > 15) {
+                messages.shift();
+            }
+            this.setState({messages: messages});
         }
         else {
             console.log("Got unknown message event type: ", data['type']);
@@ -46,16 +50,12 @@ class ChatRoom extends React.Component {
 
     render() {
         let messageWindow = this.state.messages.map( (line, index) => (
-            <li key={index}>
-                <div>{line.username}</div>
-                <div>{line.message}</div>
-            </li>
+            <ListGroupItem key={index}>
+                <div><strong>{line.username}</strong>: {line.message}</div>
+            </ListGroupItem>
         ));
         return (
             <div>
-                <ul>
-                    {messageWindow}
-                </ul>
                 <Form inline onSubmit={this.chatSubmit}>
                     <FormGroup controlId="formInlineName">
                       <ControlLabel>Message</ControlLabel>
@@ -65,6 +65,9 @@ class ChatRoom extends React.Component {
                     {' '}
                     <Button type="submit">Send</Button>
                 </Form>
+                <ListGroup>
+                    {messageWindow}
+                </ListGroup>
             </div>
         )
     }
