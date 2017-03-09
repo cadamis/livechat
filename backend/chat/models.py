@@ -10,3 +10,6 @@ class ChatMessage(models.Model):
     room = models.ForeignKey(ChatRoom)
     user = models.CharField(max_length=120)
     message = models.TextField(verbose_name="Message")
+
+    class Meta:
+        ordering = ['-received']

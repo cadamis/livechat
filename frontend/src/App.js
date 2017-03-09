@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { Grid, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
 import Header from './components/header';
 import Login from './components/login';
 import ChatRoom from './components/chatroom';
@@ -10,27 +10,27 @@ class App extends Component {
         super(props);
         this.state = {
             username: "",
-            channel: "Room 1",
-            chatLog: [],
+            room: "Room 1",
         };
         this.socket = new WebSocket('ws://localhost:8000/chat/');
-        this.socket.onopen = () => this.onConnect();
 
         this.nameSubmit = this.nameSubmit.bind(this);
-    }
-
-    onConnect() {
-        this.socket.send(JSON.stringify({
-            type: "Connection",
-            data: {
-                message: "You need to print this"
-            }
-        }));
+        this.setRoom = this.setRoom.bind(this);
     }
 
     nameSubmit(name) {
-        console.log("Setting name to", name);
-        this.setState({username: name});
+        this.setState({username: name}, this.setRoom("Room 1"));
+
+    }
+
+    setRoom(room) {
+        this.setState({room: room});
+        this.socket.send(JSON.stringify({
+            type: "JOIN_ROOM",
+            data: {
+                room: room,
+            }
+        }));
     }
 
     render() {
@@ -55,10 +55,21 @@ class App extends Component {
                         </Row>
                         <Row>
                             <Col xs={2}>
-                                Channel List
+                                <ListGroup>
+                                    <ListGroupItem onClick={this.setRoom.bind(this, "Room 1")}>
+                                    Room 1
+                                    </ListGroupItem>
+                                    <ListGroupItem onClick={this.setRoom.bind(this, "Room 2")}>
+                                    Room 2
+                                    </ListGroupItem>
+                                    <ListGroupItem onClick={this.setRoom.bind(this, "Room 3")}>
+                                    Room 3
+                                    </ListGroupItem>
+                                </ListGroup>
                             </Col>
                             <Col xs={10}>
-                                <ChatRoom socket={this.socket} username={this.state.username} channel={this.state.channel}/>
+                                <ChatRoom socket={this.socket} username={this.state.username} room={this.state.room}
+                                ref="chatroom"/>
                             </Col>
                         </Row>
                     </Grid>
